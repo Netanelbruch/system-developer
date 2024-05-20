@@ -1,0 +1,233 @@
+        -:    0:Source:main.c
+        -:    0:Graph:main.gcno
+        -:    0:Data:main.gcda
+        -:    0:Runs:6
+        -:    1:// C program for Dijkstra's single source shortest path
+        -:    2:// algorithm. The program is for adjacency matrix
+        -:    3:// representation of the graph
+        -:    4:
+        -:    5:#include <limits.h>
+        -:    6:#include <stdbool.h>
+        -:    7:#include <stdio.h>
+        -:    8:#include <stdbool.h>
+        -:    9:#include <stdlib.h>
+        -:   10:#include <string.h>
+        -:   11:#include <ctype.h>
+        -:   12:
+        -:   13:// A utility function to find the vertex with minimum
+        -:   14:// distance value, from the set of vertices not yet included
+        -:   15:// in shortest path tree
+        4:   16:int minDistance(int dist[],int size, bool sptSet[])
+        -:   17:{
+        -:   18:    // Initialize min value
+        4:   19:    int min = INT_MAX, min_index;
+        -:   20:
+       24:   21:    for (int v = 0; v < size; v++)
+       20:   22:        if (sptSet[v] == false && dist[v] <= min)
+        5:   23:            min = dist[v], min_index = v;
+        -:   24:
+        4:   25:    return min_index;
+        -:   26:}
+        -:   27:
+        -:   28:// A utility function to print the constructed distance
+        -:   29:// array
+        1:   30:void printSolution(int dist[], int size)
+        -:   31:{
+        1:   32:    printf("Vertex \t\t Distance from Source\n");
+        6:   33:    for (int i = 0; i < size; i++)
+        5:   34:        printf("%d \t\t\t\t %d\n", i, dist[i]);
+        1:   35:}
+        -:   36:
+        -:   37:// Function that implements Dijkstra's single source
+        -:   38:// shortest path algorithm for a graph represented using
+        -:   39:// adjacency matrix representation
+        1:   40:void dijkstra(int** graph, int size , int src)
+        1:   41:{
+        1:   42:    int dist[size]; // The output array.  dist[i] will hold the
+        -:   43:                 // shortest
+        -:   44:    // distance from src to i
+        -:   45:
+        1:   46:    bool sptSet[size]; // sptSet[i] will be true if vertex i is
+        -:   47:                    // included in shortest
+        -:   48:    // path tree or shortest distance from src to i is
+        -:   49:    // finalized
+        -:   50:
+        -:   51:    // Initialize all distances as INFINITE and stpSet[] as
+        -:   52:    // false
+        6:   53:    for (int i = 0; i < size; i++)
+        5:   54:        dist[i] = INT_MAX, sptSet[i] = false;
+        -:   55:
+        -:   56:    // Distance of source vertex from itself is always 0
+        1:   57:    dist[src] = 0;
+        -:   58:
+        -:   59:    // Find shortest path for all vertices
+        5:   60:    for (int count = 0; count < size - 1; count++) {
+        -:   61:        // Pick the minimum distance vertex from the set of
+        -:   62:        // vertices not yet processed. u is always equal to
+        -:   63:        // src in the first iteration.
+        4:   64:        int u = minDistance(dist, size , sptSet);
+        -:   65:
+        -:   66:        // Mark the picked vertex as processed
+        4:   67:        sptSet[u] = true;
+        -:   68:
+        -:   69:        // Update dist value of the adjacent vertices of the
+        -:   70:        // picked vertex.
+       24:   71:        for (int v = 0; v < size; v++)
+        -:   72:
+        -:   73:            // Update dist[v] only if is not in sptSet,
+        -:   74:            // there is an edge from u to v, and total
+        -:   75:            // weight of path from src to  v through u is
+        -:   76:            // smaller than current value of dist[v]
+       20:   77:            if (!sptSet[v] && graph[u][v]
+       10:   78:                && dist[u] != INT_MAX
+       10:   79:                && dist[u] + graph[u][v] < dist[v])
+        6:   80:                dist[v] = dist[u] + graph[u][v];
+        -:   81:    }
+        -:   82:
+        -:   83:    // print the constructed distance array
+        1:   84:    printSolution(dist, size);
+        1:   85:}
+        -:   86:
+        -:   87:// driver's code
+        -:   88:
+        -:   89:
+        6:   90:int main()
+        -:   91:{
+        -:   92:    int** graph;
+        6:   93:    char* line = NULL;
+        6:   94:    int counter = 0;
+        -:   95:    char num;
+        -:   96:    int size;
+        6:   97:    int line_size = 0;
+        6:   98:    printf("How many verticies do you want?\n");
+        6:   99:    scanf("%d", &size);
+        6:  100:    if (size > 1000)
+        -:  101:    {
+        1:  102:        printf("too much verticies, needed under 1000\n");
+        1:  103:        return 1;
+        -:  104:    }
+        -:  105:        
+        5:  106:    getchar();  // Consume the newline character after the integer input
+        -:  107:
+        -:  108:    // Allocate memory for the graph
+        5:  109:    graph = (int**)malloc(size * sizeof(int*));
+        5:  110:    if (graph == NULL) {
+    #####:  111:        printf("Memory allocation failed\n");
+    #####:  112:        return 1;
+        -:  113:    }
+        -:  114:
+       21:  115:    for (int i = 0; i < size; i++) {
+       16:  116:        graph[i] = (int*)malloc(size * sizeof(int));
+       16:  117:        if (graph[i] == NULL) {
+    #####:  118:            printf("Memory allocation failed\n");
+        -:  119:            // Free previously allocated memory before returning
+    #####:  120:            for (int j = 0; j < i; j++) {
+    #####:  121:                free(graph[j]);
+        -:  122:            }
+    #####:  123:            free(graph);
+    #####:  124:            return 1;
+        -:  125:        }
+        -:  126:    }
+        -:  127:
+       13:  128:    for (int i = 0; i < size; i++)
+        -:  129:    {       
+        -:  130:        // scan line
+       83:  131:        while(scanf("%c",&num) == 1)
+        -:  132:        {   
+       83:  133:            if (num == '\n')
+        -:  134:            {
+       10:  135:                break;
+        -:  136:            }
+        -:  137:            
+       73:  138:            if (!isdigit(num) && num != 32)
+        -:  139:            {
+        2:  140:                if(num == 45)   // 45 is '-'
+        1:  141:                    printf("you used a minus number\n");
+        -:  142:                else
+        1:  143:                    printf("you put a letter, error \n");
+        2:  144:                return 1;
+        -:  145:            }
+        -:  146:
+        -:  147:            // Reallocate memory to hold one more character
+       71:  148:            char* temp = realloc(line, (counter+1) * sizeof(char));
+       71:  149:            if (temp == NULL) {
+        -:  150:                // Handle memory allocation failure
+    #####:  151:                free(line); // Free any already allocated memory
+    #####:  152:                fprintf(stderr, "Memory allocation failed\n");
+    #####:  153:                return 1;
+        -:  154:            }
+       71:  155:            line = temp;
+        -:  156:
+        -:  157:            // Add the character to the string
+       71:  158:            line[counter] = num;
+       71:  159:            counter++;
+        -:  160:        }
+        -:  161:        
+        -:  162:        // Make a copy of the original line
+       10:  163:        char* line_copy = strdup(line);
+       10:  164:        if (line_copy == NULL) {
+        -:  165:            // Handle memory allocation failure
+    #####:  166:            fprintf(stderr, "Memory allocation failed\n");
+    #####:  167:            return 1;
+        -:  168:        }
+        -:  169:
+        -:  170:        // Split the line into tokens to find the size
+       10:  171:        char* token = strtok(line_copy, " ");
+       47:  172:        while (token != NULL) {
+        -:  173:            // Move to the next token
+       37:  174:            token = strtok(NULL, " ");  
+       37:  175:            line_size++;
+        -:  176:        }
+        -:  177:
+       10:  178:        if (line_size < size)
+        -:  179:        {
+        1:  180:            printf("too few values in the line, error\n");
+        1:  181:            return 1;
+        -:  182:        }
+        9:  183:        else if (line_size > size)
+        -:  184:        {
+        1:  185:            printf("too many values in the line, error\n");
+        1:  186:            return 1;
+        -:  187:        }
+        -:  188:
+        -:  189:        // Split the line into tokens based on space delimiter
+        8:  190:        token = strtok(line, " ");
+        8:  191:        int rows = 0;
+       40:  192:        while (token != NULL) {        
+        -:  193:
+       32:  194:            int number = atoi(token);
+        -:  195:            // Convert token to integer and store in graph
+       32:  196:            graph[i][rows] = number;
+        -:  197:
+        -:  198:            // Move to the next token
+       32:  199:            token = strtok(NULL, " ");
+       32:  200:            rows++;
+        -:  201:        }
+        8:  202:        free(line);     // reset line
+        8:  203:        counter = 0;
+        8:  204:        line = NULL;
+        8:  205:        line_size = 0;
+        -:  206:    }
+        -:  207:    
+        1:  208:    printf("\nyour graph is: \n");
+        -:  209:    // Print the graph for verification
+        6:  210:    for (int i = 0; i < size; i++) {
+       30:  211:        for (int j = 0; j < size; j++)
+        -:  212:        {
+       25:  213:            printf("%d ", graph[i][j]);
+        -:  214:        }          
+        5:  215:        printf("\n");
+        -:  216:    }
+        1:  217:    printf("\n");
+        -:  218:
+        -:  219:    // Function call
+        1:  220:    dijkstra(graph,size,0);
+        -:  221:
+        -:  222:    // Free memory allocated for graph
+        6:  223:    for (int i = 0; i < size; i++) {
+        5:  224:        free(graph[i]);
+        -:  225:    }
+        1:  226:    free(graph);
+        -:  227:    
+        1:  228:    return 0;
+        -:  229:}
